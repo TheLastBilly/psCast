@@ -1,8 +1,13 @@
+file(
+    GLOB utilities_src
+    "*.hpp"
+    "*.cpp"
+)
+
 add_library(
     utilities.lib
 
-    downloads.cpp
-    xml.cpp
+    ${utilities_src}
 )
 
 target_include_directories(

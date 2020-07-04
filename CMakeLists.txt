@@ -50,7 +50,6 @@ target_link_libraries(${PROJECT_NAME}
   application.lib
   drivers.lib
   utilities.lib
-  tinyxml.lib
 )
 
 vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME})
