@@ -9,8 +9,15 @@
 #include <psp2/shellutil.h>
 #include <psp2/sysmodule.h>
 
+#include "http.hpp"
+
 int main(int argc, char const *argv[])
 {
+	HttpBase::Init();
+	HttpBase * dl = new Https();
+	dl->Download("https://www.example.com");
+	delete dl;
+	HttpBase::End();
 	vita2d_init();
 	while(SCE_TRUE)
 	{

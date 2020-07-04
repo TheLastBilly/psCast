@@ -13,13 +13,14 @@ project(pscast)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 set(VITA_APP_NAME "psCast")
-set(VITA_TITLEID  "VSDK00001")
+set(VITA_TITLEID  "PCAST00001")
 set(VITA_VERSION  "0.01")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-add_subdirectory(source)
+find_package(CURL REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 add_executable(
   ${PROJECT_NAME}
@@ -27,10 +28,38 @@ add_executable(
   source/main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}
+SET_PROPERTY(GLOBAL PROPERTY LIBS "")
+macro(add_module)
+  get_filename_component(MODULE ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+  file(
+      GLOB SRCS
+      "*.cpp"
+  )
+
+  add_library(
+      ${MODULE}.lib
+
+      ${SRCS}
+  )
+
+  target_include_directories(
+      ${PROJECT_NAME}
+
+      PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
+  GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
+  SET_PROPERTY(GLOBAL PROPERTY LIBS ${libs_l} ${MODULE}.lib)
+endmacro()
+
+add_subdirectory(source)
+
+GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
+target_link_libraries(
+  ${PROJECT_NAME}
   m
   vita2d
-  SceDisplay_stub
   SceCtrl_stub
   SceAudio_stub
   mpg123
@@ -45,11 +74,20 @@ target_link_libraries(${PROJECT_NAME}
   ScePower_stub
   SceRtc_stub
   SceShellSvc_stub
+  SceDisplay_stub
+  SceIofilemgr_stub
   SceSysmodule_stub
   SceTouch_stub
-  application.lib
-  drivers.lib
-  utilities.lib
+  SceNet_stub
+  SceNetCtl_stub
+  SceHttp_stub
+  SceSsl_stub
+  ${CURL_LIBRARIES}
+  ${OPENSSL_LIBRARIES}
+  ${libs_l}
+  c
+  m
+  z
 )
 
 vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME})
