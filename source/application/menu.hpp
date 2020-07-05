@@ -4,6 +4,8 @@
 #include <functional>
 #include <vector>
 
+#include "gui.hpp"
+
 class MenuLabel 
 {
 protected:
@@ -87,12 +89,10 @@ public:
     }
 };
 
-class Menu
+class Menu: public GUI
 {
-    static int Init();
-    static int End();
-
-    static int checkoutEntryList();
-    static int setEntryListActive( int index );
-    static int setEntryListActive( std::string index );
+public:
+    int setCurrentEntryList(  );
+    int setEntryListActive( int index );
+    int setEntryListActive( std::string index );
 };
