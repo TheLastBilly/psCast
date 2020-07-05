@@ -20,7 +20,7 @@ protected:
     static const std::string dl_dir;
     static bool is_init;
 
-    static constexpr const std::string default_dir = "ux0:/";
+    static constexpr const char * default_dir = "ux0:/";
 
 public:
     enum {
@@ -48,7 +48,7 @@ public:
         {
             return download(url, default_dir + url.substr(pos+1) );
         }
-        return download(url, default_dir + "downloaded_file");
+        return download(url, std::string(default_dir) + "downloaded_file");
     }
 };
 

@@ -92,6 +92,7 @@ public:
 class Menu: public GUI
 {
 public:
+    Menu();
     int setCurrentEntryList(  );
     int setEntryListActive( int index );
     int setEntryListActive( std::string index );

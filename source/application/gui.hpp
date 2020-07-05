@@ -2,6 +2,8 @@
 
 class GUI
 {
+private:
+    static bool is_init;
 public:
     enum 
     {
@@ -11,6 +13,11 @@ public:
     static int Init();
     static int End();
 
-    virtual int draw() = 0;
+    bool isInit()
+    {
+        return is_init;
+    }
+
     virtual int updateInput() = 0;
+    virtual int draw() = 0;
 };

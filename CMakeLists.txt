@@ -12,9 +12,9 @@ endif()
 project(pscast)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
-set(VITA_APP_NAME "psCast")
-set(VITA_TITLEID  "PCAST00001")
-set(VITA_VERSION  "0.01")
+set(VITA_APP_NAME "psCast Podcast Client")
+set(VITA_TITLEID  "VSDK00014")
+set(VITA_VERSION  "01.00")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
