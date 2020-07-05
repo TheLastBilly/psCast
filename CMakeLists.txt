@@ -25,7 +25,7 @@ find_package(OpenSSL REQUIRED)
 add_executable(
   ${PROJECT_NAME}
 
-  source/main.cpp
+  src/main.cpp
 )
 
 SET_PROPERTY(GLOBAL PROPERTY LIBS "")
@@ -53,7 +53,7 @@ macro(add_module)
   SET_PROPERTY(GLOBAL PROPERTY LIBS ${libs_l} ${MODULE}.lib)
 endmacro()
 
-add_subdirectory(source)
+add_subdirectory(src)
 
 GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
 target_link_libraries(

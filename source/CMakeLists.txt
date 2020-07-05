@@ -1,4 +1,0 @@
-add_subdirectory(drivers)
-add_subdirectory(utilities)
-add_subdirectory(libraries)
-add_subdirectory(application)
