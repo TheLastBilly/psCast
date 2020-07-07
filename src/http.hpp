@@ -22,6 +22,9 @@ protected:
 
     static constexpr const char * default_dir = "ux0:/";
 
+    static int init();
+    static int end();
+
 public:
     enum {
       OK,
@@ -36,9 +39,6 @@ public:
     };
 
     HttpBase(){}
-
-    static int Init();
-    static int End();
 
     virtual int download( std::string url, std::string path ) = 0;
     int download( std::string url )

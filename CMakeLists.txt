@@ -12,8 +12,8 @@ endif()
 project(pscast)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
-set(VITA_APP_NAME "psCast Podcast Client")
-set(VITA_TITLEID  "VSDK00014")
+set(VITA_APP_NAME "psCast")
+set(VITA_TITLEID  "PCAST0001")
 set(VITA_VERSION  "01.00")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
@@ -60,6 +60,7 @@ target_link_libraries(
   ${PROJECT_NAME}
   m
   vita2d
+  png
   SceCtrl_stub
   SceAudio_stub
   mpg123
@@ -82,6 +83,7 @@ target_link_libraries(
   SceNetCtl_stub
   SceHttp_stub
   SceSsl_stub
+  freetype
   ${CURL_LIBRARIES}
   ${OPENSSL_LIBRARIES}
   ${libs_l}
@@ -94,4 +96,5 @@ vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME})
 vita_create_vpk(${PROJECT_NAME}.vpk ${VITA_TITLEID} ${PROJECT_NAME}.self
   VERSION ${VITA_VERSION}
   NAME ${VITA_APP_NAME}
+  FILE sce_sys/Square.ttf system_font.tff
 )

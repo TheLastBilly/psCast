@@ -10,14 +10,36 @@
 #include <psp2/sysmodule.h>
 
 #include "http.hpp"
+#include "menu.hpp"
 
 int main(int argc, char const *argv[])
 {
-	HttpBase::Init();
-	HttpBase * dl = new Https();
-	dl->download("https://www.example.com");
-	delete dl;
-	HttpBase::End();
+	SceAppUtilInitParam init;
+	SceAppUtilBootParam boot;
+	memset(&init, 0, sizeof(SceAppUtilInitParam));
+	memset(&boot, 0, sizeof(SceAppUtilBootParam));
+	
+	int ret = 0;
+	
+	sceAppUtilInit(&init, &boot);
+
+	sceAppUtilMusicMount();
+	
+	GUI::init();
+	vita2d_set_clear_color(RGBA8(250, 250, 250, 255));
+	Menu *menu = new Menu();
+	MenuEntry entry("Test", nullptr);
+	MenuList list;
+	for(int i = 0; i < 15; i++)
+		list.append( entry );
+	menu->checkoutEntryList(list);
+	GUI::checkoutActiveGUI(menu);
+	while(SCE_TRUE)
+	{
+		GUI::cycleActiveGUI();
+	}
+	delete menu;
+	GUI::end();
 	sceKernelExitProcess(0);
 
 	return 0;

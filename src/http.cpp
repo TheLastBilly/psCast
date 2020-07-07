@@ -48,10 +48,10 @@ namespace
 	}
 }
 
-int HttpBase::Init()
+int HttpBase::init()
 {
 	if(is_init)
-		End();
+		return OK;
 
     //Net init
     if(sceSysmoduleLoadModule(SCE_SYSMODULE_NET) != 0)
@@ -78,10 +78,10 @@ int HttpBase::Init()
     return OK;
 }
 
-int HttpBase::End()
+int HttpBase::end()
 {
 	if(!is_init)
-		return NOT_INIT;
+		return OK;
 
     //HTTP deinit
     if(sceHttpTerm() != 0)
@@ -102,15 +102,15 @@ int HttpBase::End()
 
 int Https::download( std::string url, std::string path )
 {	
-	if(!is_init)
-		return NOT_INIT;
+	int st = init();
+
+	if(st != OK)
+		return st;
 
     int imageFD = sceIoOpen( path.c_str(), SCE_O_WRONLY | SCE_O_CREAT, 0777);
 	if(!imageFD){
 		return NET_SOCKET_ERROR;
 	}
-	
-	int st = OK;
 
 	CURL *curl;
 	CURLcode res;
@@ -161,6 +161,11 @@ int Https::download( std::string url, std::string path )
 
 int Http::download( std::string url, std::string path )
 {
+	int st = init();
+
+	if(st != OK)
+		return st;
+		
 	int tpl = sceHttpCreateTemplate("psCast", 1, 1);
 	int conn = sceHttpCreateConnectionWithURL(tpl, url.c_str(), 0);
 	int request = sceHttpCreateRequestWithURL(conn, SCE_HTTP_METHOD_GET, url.c_str(), 0);
