@@ -42,7 +42,7 @@ void Menu::drawList( uint index )
     if(menu_list == nullptr)
         return;
     
-    size_t increment = entry_count*(index/8);
+    size_t increment = index/entry_count;
 
     size_t m_s = menu_list->size();
     uint i = increment*entry_count;
@@ -50,16 +50,12 @@ void Menu::drawList( uint index )
         return;
     
     int start = info_height + current_context_height;
-    uint color = 0;
 
     while(i < m_s && start < PSCAST_DISPLAY_HEIGHT)
     {
-        if(index == i)
-            color = active_color;
-        else
-            color = released_color;
-        
-        vita2d_draw_rectangle(0, start, entry_width, entry_height, color);
+        vita2d_clear_screen();
+        if(index == i)    
+            vita2d_draw_rectangle(0, start, entry_width, entry_height, active_color);
         vita2d_font_draw_text(system_font, 10, start + entry_height*0.7, RGBA8(51, 51, 51, 255), entry_height/2, menu_list->at(i).getLabel().c_str());
         start+=entry_height;
         i++;
@@ -73,18 +69,12 @@ void Menu::drawHeader()
 }
 
 void Menu::goDownOnList()
-{
-    if(menu_list == nullptr &&  entry_index > 0)
-        return;
-    
+{   
     if(entry_index < menu_list->size() - 1)
         entry_index++;
 }
 void Menu::goUpOnList()
 {
-    if(menu_list == nullptr)
-        return;
-    
     if(entry_index > 0)
         entry_index--;
 }
@@ -96,16 +86,14 @@ int Menu::setup()
 
 int Menu::draw()
 {
-    switch (pressed_buttons)
+    if(menu_list != nullptr)
     {
-    case SCE_CTRL_DOWN:
-        goDownOnList();
-        break;
-    case SCE_CTRL_UP:
-        goUpOnList();
-        break;
-    default:
-        break;
+        if(pressed_buttons & SCE_CTRL_DOWN)
+            goDownOnList();
+        else if(pressed_buttons & SCE_CTRL_UP)
+            goUpOnList();
+        else if(pressed_buttons & SCE_CTRL_CIRCLE)
+            menu_list->at(entry_index).run();
     }
 
     vita2d_start_drawing();

@@ -6,10 +6,8 @@ vita2d_font * GUI::system_font = nullptr;
 
 void GUI::updateInput( SceCtrlData &ctrl_data )
 {
-    static SceCtrlData old_data = {0};
+    static SceUInt32 old_data = 0xffffffff;
     
     pressed_buttons = 
-        ctrl_data.buttons & ~old_data.buttons;
-    
-    old_data = ctrl_data;
+        ctrl_data.buttons & ~old_data;
 }
