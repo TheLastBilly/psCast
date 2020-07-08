@@ -10,4 +10,5 @@ void GUI::updateInput( SceCtrlData &ctrl_data )
     
     pressed_buttons = 
         ctrl_data.buttons & ~old_data;
+    old_data = ctrl_data.buttons;
 }

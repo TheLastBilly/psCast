@@ -6,6 +6,8 @@
 
 #include "gui.hpp"
 
+#define HEADER_DEBUG
+
 class MenuLabel 
 {
 protected:
@@ -17,7 +19,9 @@ public:
     
     bool operator==( const std::string &label )
     {
-        return label.size() > this->label.size() && this->label.find(label) != std::string::npos;
+        return 
+            label.size() > this->label.size() && 
+            this->label.find(label) != std::string::npos;
     }
 };
 
@@ -148,20 +152,25 @@ private:
 
     size_t entry_index = 0;
     MenuList *menu_list = nullptr;
+    MenuList internal_menu_list;
 
     uint entry_width = PSCAST_DISPLAY_WIDTH;
 
-    uint released_color = RGBA8(240, 240, 230, 255);
+    uint clear_text_color = RGBA8(240, 240, 230, 255);
+    uint dark_text_color = RGBA8(51, 51, 51, 255);
     uint active_color = RGBA8(140, 140, 130, 255);
     
+    std::string debug_msg = "";
 public:
     Menu();
+
     ~Menu();
 
     void minimizeList();
     void expandList();
 
     void checkoutEntryList( const MenuList &menu_list );
+    void checkoutEntryList( MenuList *menu_list );
     bool setEntryActive( size_t index );
     bool setEntryActive( std::string index );
 

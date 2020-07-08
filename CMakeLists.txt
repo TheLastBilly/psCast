@@ -22,48 +22,30 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
+file(GLOB SRCS
+  "src/*.cpp"
+)
+
 add_executable(
   ${PROJECT_NAME}
 
   src/main.cpp
+  ${SRCS}
 )
-
-SET_PROPERTY(GLOBAL PROPERTY LIBS "")
-macro(add_module)
-  get_filename_component(MODULE ${CMAKE_CURRENT_SOURCE_DIR} NAME)
-
-  file(
-      GLOB SRCS
-      "*.cpp"
-  )
-
-  add_library(
-      ${MODULE}.lib
-
-      ${SRCS}
-  )
-
-  target_include_directories(
-      ${PROJECT_NAME}
-
-      PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  )
-
-  GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
-  SET_PROPERTY(GLOBAL PROPERTY LIBS ${libs_l} ${MODULE}.lib)
-endmacro()
-
-add_subdirectory(src)
 
 GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
 target_link_libraries(
   ${PROJECT_NAME}
-  m
   vita2d
+  freetype
   png
+  jpeg
+  z
+  c
+  m
+  mpg123
   SceCtrl_stub
   SceAudio_stub
-  mpg123
   SceAppMgr_stub
   SceAppUtil_stub
   SceAudio_stub
@@ -86,10 +68,6 @@ target_link_libraries(
   freetype
   ${CURL_LIBRARIES}
   ${OPENSSL_LIBRARIES}
-  ${libs_l}
-  c
-  m
-  z
 )
 
 vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME})
