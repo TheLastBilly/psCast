@@ -8,7 +8,10 @@
 #include <psp2/sysmodule.h>
 
 #include <memory>
+
+#include "logger.hpp"
 #include "menu.hpp"
+#include "settings.hpp"
 
 class App
 {

@@ -160,7 +160,7 @@ private:
     uint dark_text_color = RGBA8(51, 51, 51, 255);
     uint active_color = RGBA8(140, 140, 130, 255);
     
-    std::string debug_msg = "";
+    std::string status_msg = "";
 public:
     Menu();
 
@@ -177,6 +177,8 @@ public:
     void drawList( uint index );
     void drawList( uint index, uint increment );
     void drawHeader();
+
+    void setStatusLabel( const std::string &label );
 
     void goDownOnList();
     void goUpOnList();

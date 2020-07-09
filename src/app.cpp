@@ -1,10 +1,25 @@
 #include "app.hpp"
+#include "podcast.hpp"
+#include "http.hpp"
 
 App::App():
     options_list(
         "options",
         {
-            MenuEntry("test", nullptr),
+            MenuEntry("test", [=](){
+                Https https;
+                int st = https.download("https://locono.live/feed.rss");
+                Podcast podcast;
+                try
+                {
+                    st = podcast.parseFromXmlStream(https.getCurrentPage());
+                }
+                catch(const std::exception &e)
+                {
+                    Logger::log("Parser error: " + std::string(e.what()));
+                }
+
+            }),
             MenuEntry("back", [=](){goToWindow(WINDOW::MAIN_MENU);})
         }
     ),
@@ -21,6 +36,14 @@ App::App():
 
 void App::init()
 {
+	struct SceIoStat * dirStat = (SceIoStat*)malloc(sizeof(SceIoStat));
+	if(sceIoGetstat(PSCAST_DATA_FOLDER , dirStat) < 0){
+		sceIoMkdir(PSCAST_DATA_FOLDER , 0777);
+	}
+    free(dirStat);
+
+    Logger::init(PSCAST_DATA_FOLDER "syslog.txt");
+
 	SceAppUtilInitParam init;
 	SceAppUtilBootParam boot;
 

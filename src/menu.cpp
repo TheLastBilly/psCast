@@ -96,7 +96,7 @@ void Menu::drawHeader()
         10, info_height*0.7, 
         clear_text_color, 
         info_height/2, 
-        debug_msg.c_str()
+        status_msg.c_str()
     );
 #endif
 
@@ -113,6 +113,11 @@ void Menu::drawHeader()
         current_context_height/2, 
         menu_list->getLabel().c_str()
     );
+}
+
+void Menu::setStatusLabel( const std::string &label )
+{
+    status_msg = label;
 }
 
 void Menu::goDownOnList()

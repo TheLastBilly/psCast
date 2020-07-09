@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include <psp2/sysmodule.h>
 #include <psp2/kernel/processmgr.h>
@@ -19,8 +20,7 @@ class HttpBase
 protected:
     static const std::string dl_dir;
     static bool is_init;
-
-    static constexpr const char * default_dir = "ux0:/";
+    std::string current_page;
 
     static int init();
     static int end();
@@ -37,19 +37,12 @@ public:
       CURL_ERROR,
       NOT_INIT
     };
-
+    
     HttpBase(){}
 
-    virtual int download( std::string url, std::string path ) = 0;
-    int download( std::string url )
-    {
-        size_t pos = std::string::npos;
-        if((pos = url.rfind('/')) != std::string::npos && pos < url.size() -1)
-        {
-            return download(url, default_dir + url.substr(pos+1) );
-        }
-        return download(url, std::string(default_dir) + "downloaded_file");
-    }
+    virtual int download( std::string url ) = 0;
+    std::string getCurrentPage();
+    static std::string getStatusDesc(int desc);
 };
 
 class Http: public HttpBase 
@@ -57,13 +50,17 @@ class Http: public HttpBase
 public:
     Http():
         HttpBase(){}
-    int download( std::string url, std::string path ) override;
+    int download( std::string url ) override;
 };
 
 class Https: public HttpBase 
 {
+private:
+    CURLcode curl_error = CURLE_OK;
 public:
     Https():
         HttpBase(){}
-    int download( std::string url, std::string path ) override;
+    int download( std::string url ) override;
+    CURLcode getCurlError();
+    std::string getCurlErrorDesc();
 };

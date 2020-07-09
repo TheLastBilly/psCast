@@ -13,7 +13,7 @@ project(pscast)
 include("${VITASDK}/share/vita.cmake" REQUIRED)
 
 set(VITA_APP_NAME "psCast")
-set(VITA_TITLEID  "PCAST0001")
+set(VITA_TITLEID  "PCAST0001" CACHE INTERNAL "")
 set(VITA_VERSION  "01.00")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu11")
@@ -26,10 +26,34 @@ file(GLOB SRCS
   "src/*.cpp"
 )
 
+SET_PROPERTY(GLOBAL PROPERTY LIBS "")
+macro(add_module)
+  get_filename_component(MODULE ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+  file(
+      GLOB SRCS
+      "*.cpp"
+  )
+
+  add_library(
+      ${MODULE}.lib
+
+      ${SRCS}
+  )
+
+  target_include_directories(
+      ${PROJECT_NAME}
+
+      PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+  )
+
+  GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
+  SET_PROPERTY(GLOBAL PROPERTY LIBS ${libs_l} ${MODULE}.lib)
+endmacro()
+
 add_executable(
   ${PROJECT_NAME}
 
-  src/main.cpp
   ${SRCS}
 )
 
@@ -68,6 +92,7 @@ target_link_libraries(
   freetype
   ${CURL_LIBRARIES}
   ${OPENSSL_LIBRARIES}
+  ${libs_l}
 )
 
 vita_create_self(${PROJECT_NAME}.self ${PROJECT_NAME})

@@ -6,6 +6,39 @@
 
 bool HttpBase::is_init = false;
 
+std::string HttpBase::getStatusDesc(int desc)
+{
+	switch (desc)
+	{
+	case OK:
+		return "OK";
+	case NET_MODULE_ERROR:
+		return "NET_MODULE_ERROR";
+	case NET_RUN_ERROR:
+		return "NET_RUN_ERROR";
+	case NET_CTL_ERROR:
+		return "NET_CTL_ERROR";
+	case NET_SOCKET_ERROR:
+		return "NET_SOCKET_ERROR";
+	case HTTP_MODULE_ERROR:
+		return "HTTP_MODULE_ERROR";
+	case HTTP_RUN_ERROR:
+		return "HTTP_RUN_ERROR";
+	case CURL_ERROR:
+		return "CURL_ERROR";
+	case NOT_INIT:
+		return "NOT_INIT";
+	
+	default:
+		return "";
+	}
+}
+
+std::string HttpBase::getCurrentPage()
+{
+	return current_page;
+}
+
 namespace
 {
 	struct stringcurl {
@@ -41,10 +74,10 @@ namespace
 		return size*nmemb;
 	}
 
-		static size_t write_data_to_disk(void *ptr, size_t size, size_t nmemb, void *stream)
-		{
-		size_t written = sceIoWrite(   *(int*) stream , ptr , size*nmemb);
-		return written;
+	static size_t write_data_to_disk(void *ptr, size_t size, size_t nmemb, void *stream)
+	{
+		*((std::string *)stream) = std::string((const char *)ptr, nmemb*size);
+		return nmemb*size;
 	}
 }
 
@@ -100,20 +133,14 @@ int HttpBase::end()
     return OK;
 }
 
-int Https::download( std::string url, std::string path )
+int Https::download( std::string url )
 {	
 	int st = init();
 
 	if(st != OK)
 		return st;
 
-    int imageFD = sceIoOpen( path.c_str(), SCE_O_WRONLY | SCE_O_CREAT, 0777);
-	if(!imageFD){
-		return NET_SOCKET_ERROR;
-	}
-
 	CURL *curl;
-	CURLcode res;
 	curl = curl_easy_init();
 	if(curl) 
 	{
@@ -132,7 +159,7 @@ int Https::download( std::string url, std::string path )
 
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data_to_disk);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &imageFD);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &current_page);
 		curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, writefunc);
 		curl_easy_setopt(curl, CURLOPT_HEADERDATA, &header);
 		
@@ -141,25 +168,34 @@ int Https::download( std::string url, std::string path )
 		headerchunk = curl_slist_append(headerchunk, "Content-Type: application/json");
 		headerchunk = curl_slist_append(headerchunk, std::string("User-Agent: " + std::string(usr_agent)).c_str());
 		headerchunk = curl_slist_append(headerchunk, "Content-Length: 0");
-		res = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerchunk);
+		curl_error = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerchunk);
 		
-		res = curl_easy_perform(curl);
+		curl_error = curl_easy_perform(curl);
 		int httpresponsecode = 0;
 		curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &httpresponsecode);
 		
-		if(res != CURLE_OK){}
-			st = CURL_ERROR;	
+		if(curl_error != CURLE_OK){
+			st = CURL_ERROR;
+		}
 	}
 	else
 		st = CURL_ERROR;
-
-	sceIoClose(imageFD);
+		
 	curl_easy_cleanup(curl);
 	
 	return st;
 }
 
-int Http::download( std::string url, std::string path )
+CURLcode Https::getCurlError()
+{
+	return curl_error;
+}
+std::string Https::getCurlErrorDesc()
+{
+	return curl_easy_strerror(curl_error);
+}
+
+int Http::download( std::string url )
 {
 	int st = init();
 
@@ -171,17 +207,12 @@ int Http::download( std::string url, std::string path )
 	int request = sceHttpCreateRequestWithURL(conn, SCE_HTTP_METHOD_GET, url.c_str(), 0);
 	int handle = sceHttpSendRequest(request, NULL, 0);
 
-	int fh = sceIoOpen(path.c_str(), SCE_O_WRONLY | SCE_O_CREAT, 0777);
-    if(fh < 0)
-        return NET_SOCKET_ERROR;
-
+	current_page = "";
 	unsigned char data[16*1024];
 	int read = 0;
 
 	while ((read = sceHttpReadData(request, &data, sizeof(data))) > 0)
-		int write = sceIoWrite(fh, data, read);
-
-	sceIoClose(fh);
+		current_page.append(std::string((const char*)data, read));
 
     return OK;
 }
