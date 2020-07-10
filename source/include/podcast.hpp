@@ -4,13 +4,14 @@
 #include <vector>
 
 #include "logger.hpp"
-#include "rapidxml.hpp"
+#include "tinyxml2.h"
 
 class Podcast
 {
 public:
     enum
     {
+        OK,
         PARSER_CHANNEL_ERROR,
         PARSER_TITLE_ERROR,
         PARSER_AUTHOR_ERROR,

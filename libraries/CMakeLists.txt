@@ -1,1 +1,1 @@
-add_subdirectory(rapidxml)
+add_subdirectory(tinyxml2)

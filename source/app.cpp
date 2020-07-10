@@ -17,7 +17,18 @@ App::App():
                 catch(const std::exception &e)
                 {
                     Logger::nlog("Parser error: " + std::string(e.what()));
-                    Logger::nlog("Parser status " + std::to_string(st));
+                }
+                menu.setStatusLabel("PARSER: " + std::to_string(st));
+                Logger::nlog(std::string("name: ") + podcast.name);
+                Logger::nlog(std::string("description: ") + podcast.description);
+                Logger::nlog(std::string("url: ") + podcast.url);
+                Logger::nlog(std::string("author: ") + podcast.author);
+
+                for(Podcast::Episode e : podcast.episodes)
+                {
+                    Logger::nlog(std::string("name: ") + e.name);
+                    Logger::nlog(std::string("description: ") + e.description);
+                    Logger::nlog(std::string("url: ") + e.url);
                 }
             }),
             MenuEntry("back", [=](){goToWindow(WINDOW::MAIN_MENU);})
