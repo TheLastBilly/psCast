@@ -90,7 +90,7 @@ void Menu::drawHeader()
         PSCAST_DISPLAY_WIDTH, info_height, 
         RGBA8(40, 40, 40, 255)
     );
-#ifdef HEADER_DEBUG
+    
     vita2d_font_draw_text(
         system_font, 
         10, info_height*0.7, 
@@ -98,7 +98,6 @@ void Menu::drawHeader()
         info_height/2, 
         status_msg.c_str()
     );
-#endif
 
     //Draw context
     vita2d_draw_rectangle(
@@ -118,6 +117,13 @@ void Menu::drawHeader()
 void Menu::setStatusLabel( const std::string &label )
 {
     status_msg = label;
+}
+void Menu::forceHeaderDraw()
+{
+    vita2d_start_drawing();
+    drawHeader();
+    vita2d_end_drawing();
+    vita2d_swap_buffers();
 }
 
 void Menu::goDownOnList()
@@ -144,8 +150,23 @@ int Menu::draw()
             goDownOnList();
         else if(pressed_buttons & SCE_CTRL_UP)
             goUpOnList();
-        else if(pressed_buttons & SCE_CTRL_CIRCLE)
+        else if(pressed_buttons & accept_button)
             menu_list->at(entry_index).run();
+        else if(pressed_buttons & back_button)
+        {
+            if(backButtonCallback != nullptr)
+                backButtonCallback();
+        }
+        else if(pressed_buttons & options_button)
+        {
+            if(optionsButtonCallback != nullptr)
+                optionsButtonCallback();
+        }
+        else if(pressed_buttons & select_button)
+        {
+            if(selectButtonCallback != nullptr)
+                selectButtonCallback();
+        }
     }
 
     vita2d_start_drawing();

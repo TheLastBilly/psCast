@@ -12,10 +12,17 @@
 #include "logger.hpp"
 #include "menu.hpp"
 #include "settings.hpp"
+#include "podcast.hpp"
+#include "http.hpp"
 
 class App
 {
 public:
+    enum 
+    {
+        OK
+    };
+
     App();
 
     static void init();
@@ -30,12 +37,16 @@ private:
     MenuList main_menu_list;
     MenuList options_list;
 
+    MenuList *current_list;
+
     enum WINDOW
     {
         OPTIONS,
         MAIN_MENU,
     };
 
-    void goToWindow(WINDOW window);
-
+    void goToWindow(MenuList *ml);
+    
+    Podcast downloadAndParseFeed(const std::string &url);
+    int updateFromFeedFile();
 };

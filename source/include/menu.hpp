@@ -161,6 +161,16 @@ private:
     uint active_color = RGBA8(140, 140, 130, 255);
     
     std::string status_msg = "";
+
+    SceCtrlButtons accept_button = SCE_CTRL_CIRCLE;
+    SceCtrlButtons back_button = SCE_CTRL_CROSS;
+    SceCtrlButtons options_button = SCE_CTRL_TRIANGLE;
+    SceCtrlButtons select_button = SCE_CTRL_SQUARE;
+
+    std::function<void()> backButtonCallback = nullptr;
+    std::function<void()> optionsButtonCallback = nullptr;
+    std::function<void()> selectButtonCallback = nullptr;
+
 public:
     Menu();
 
@@ -179,10 +189,18 @@ public:
     void drawHeader();
 
     void setStatusLabel( const std::string &label );
+    void forceHeaderDraw();
 
     void goDownOnList();
     void goUpOnList();
 
     int setup() override;
     int draw() override;
+
+    void setBackButtonCallback(const std::function<void()> &callback)
+    {backButtonCallback = callback;}
+    void setOptionsButtonCallback(const std::function<void()> &callback)
+    {optionsButtonCallback = callback;}
+    void setSelectButtonCallback(const std::function<void()> &callback)
+    {selectButtonCallback = callback;}
 };
