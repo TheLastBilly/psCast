@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "logger.hpp"
-#include "rapidxml/rapidxml.hpp"
+#include "rapidxml.hpp"
 
 class Podcast
 {

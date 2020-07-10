@@ -24,4 +24,8 @@ public:
     {
         writeToFile(msg);
     }
+    static void nlog(const std::string &msg)
+    {
+        writeToFile(msg + "\n");
+    }
 };

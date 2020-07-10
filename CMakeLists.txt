@@ -22,8 +22,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
 
+set(SOURCE_DIR "source")
+set(INCLUDE_DIR "${SOURCE_DIR}/include")
+
 file(GLOB SRCS
-  "src/*.cpp"
+  "${SOURCE_DIR}/*.cpp"
+  "${INCLUDE_DIR}/*.hpp"
 )
 
 SET_PROPERTY(GLOBAL PROPERTY LIBS "")
@@ -33,6 +37,10 @@ macro(add_module)
   file(
       GLOB SRCS
       "*.cpp"
+      "*.hpp"
+      
+      "*.c"
+      "*.h"
   )
 
   add_library(
@@ -55,6 +63,13 @@ add_executable(
   ${PROJECT_NAME}
 
   ${SRCS}
+)
+
+add_subdirectory(libraries)
+
+target_include_directories(
+  ${PROJECT_NAME}
+  PUBLIC "${INCLUDE_DIR}"
 )
 
 GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)

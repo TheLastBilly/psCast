@@ -8,7 +8,7 @@ int Podcast::parseFromXmlStream(const std::string &xml)
     typedef rapidxml::xml_node<>* node_ptr;
 
     rapidxml::xml_document<> feed;
-    feed.parse<rapidxml::parse_declaration_node | rapidxml::parse_no_data_nodes>((char *)xml.c_str());
+    feed.parse<rapidxml::parse_default>((char *)xml.c_str());
 
     node_ptr rootIndex = feed.first_node("rss")->first_node("channel");
     if(!rootIndex)

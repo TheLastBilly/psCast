@@ -16,9 +16,9 @@ App::App():
                 }
                 catch(const std::exception &e)
                 {
-                    Logger::log("Parser error: " + std::string(e.what()));
+                    Logger::nlog("Parser error: " + std::string(e.what()));
+                    Logger::nlog("Parser status " + std::to_string(st));
                 }
-
             }),
             MenuEntry("back", [=](){goToWindow(WINDOW::MAIN_MENU);})
         }
