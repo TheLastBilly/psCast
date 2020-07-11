@@ -13,8 +13,9 @@ App::App():
     main_menu_list(
         "psCast",
         {
-            MenuEntry("update", [=](){updateFromFeedFile();}),
-            MenuEntry("options", [=](){goToWindow(&options_list);}),
+            MenuEntry("add url", [this](){menu.setStatusLabel(requestInputFromImeDialog("lo hice bitch"));}),
+            MenuEntry("update", [this](){updateFromFeedFile();}),
+            MenuEntry("options", [this](){goToWindow(&options_list);}),
         }
     )
 {}
@@ -50,6 +51,9 @@ void App::end()
 
 void App::setup()
 {
+    menu.setAcceptButton(SCE_CTRL_CIRCLE);
+    menu.setBackButton(SCE_CTRL_CROSS);
+    
     menu.checkoutEntryList(&main_menu_list);
 	GUI::checkoutActiveGUI(&menu);
 }
@@ -141,4 +145,63 @@ int App::updateFromFeedFile()
 
     free(buffer);
     return OK;
+}
+
+std::string App::requestInputFromImeDialog(std::string title)
+{
+    SceCommonDialogConfigParam dparam;
+    sceCommonDialogConfigParamInit(&dparam);
+    sceCommonDialogSetConfigParam((const SceCommonDialogConfigParam *)&dparam);
+
+    SceImeDialogParam param;
+    sceImeDialogParamInit(&param);
+
+    SceWChar16 imeInputBuffer[SCE_IME_DIALOG_MAX_TEXT_LENGTH] = {0};
+
+    SceWChar16 titleBuffer[title.size()] = {0};
+    Utils::utf8To16((const uint8_t *)title.c_str(), title.size(), (uint16_t *)titleBuffer, sizeof(titleBuffer));
+
+    param.sdkVersion = 0x03150021,
+	param.supportedLanguages = 0x0001FFFF;
+	param.languagesForced = SCE_TRUE;
+	param.type = SCE_IME_TYPE_DEFAULT;
+	param.title = titleBuffer;
+	param.maxTextLength = 20;
+	param.inputTextBuffer = imeInputBuffer;
+
+    char buffer[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
+    bool showDial = true;
+    while(true)
+    {
+        if(showDial)
+        {
+            sceImeDialogInit(&param);
+            showDial = false;
+        }
+
+        if(sceImeDialogGetStatus() == 2)
+        {
+            SceImeDialogResult rst;
+            memset(&rst, 0, sizeof(SceImeDialogResult));
+
+            if(rst.button == SCE_IME_DIALOG_BUTTON_CLOSE)
+            {
+                break;
+            }
+            else 
+            {
+                Utils::utf16to8(
+                    (const uint16_t *)imeInputBuffer, SCE_IME_DIALOG_MAX_TEXT_LENGTH, 
+                    (uint8_t *)buffer, SCE_IME_DIALOG_MAX_TEXT_LENGTH
+                );
+                break;
+            }
+        }
+
+        vita2d_common_dialog_update();
+        vita2d_swap_buffers();
+    }
+    sceImeDialogTerm();
+
+    return std::string(buffer);
 }

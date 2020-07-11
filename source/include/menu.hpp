@@ -197,10 +197,19 @@ public:
     int setup() override;
     int draw() override;
 
-    void setBackButtonCallback(const std::function<void()> &callback)
+    void setAcceptButton( SceCtrlButtons button )
+    {accept_button = button;}
+    void setBackButton( SceCtrlButtons button )
+    {back_button = button;}
+    void setOptionsButton( SceCtrlButtons button )
+    {options_button = button;}
+    void setSelectButton( SceCtrlButtons button )
+    {select_button = button;}
+
+    void setBackButtonCallback(const std::function<void()> callback)
     {backButtonCallback = callback;}
-    void setOptionsButtonCallback(const std::function<void()> &callback)
+    void setOptionsButtonCallback(const std::function<void()> callback)
     {optionsButtonCallback = callback;}
-    void setSelectButtonCallback(const std::function<void()> &callback)
+    void setSelectButtonCallback(const std::function<void()> callback)
     {selectButtonCallback = callback;}
 };
