@@ -28,4 +28,19 @@ public:
     {
         writeToFile(msg + "\n");
     }
+
+    class Module
+    {
+    private:
+        std::string name;
+    public:
+        Module(const std::string &name):
+            name(name)
+        {}
+
+        void log(const std::string &msg)
+        {
+            Logger::nlog(name + ": " + msg);
+        }
+    };
 };

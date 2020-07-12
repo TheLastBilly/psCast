@@ -2,6 +2,8 @@
 
 #include "app.hpp"
 
+static Logger::Module log("app");
+
 App::App():
     options_list(
         "options",
@@ -31,7 +33,7 @@ void App::init()
     free(dirStat);
 
     Logger::init(PSCAST_DATA_FOLDER "syslog.txt");
-    Logger::log("Log started");
+    log.log("Log started");
 
 	SceAppUtilInitParam init;
 	SceAppUtilBootParam boot;
@@ -76,23 +78,14 @@ Podcast App::downloadAndParseFeed(const std::string &url)
     Podcast podcast;
     try
     {
+        log.log("stated parsing for \"" + url + "\"");
+        if(https.getCurrentPage().size() < 1)
+            throw std::runtime_error("request result from \"" + url + "\" is empty");
         st = podcast.parseFromXmlStream(https.getCurrentPage());
     }
     catch(const std::exception &e)
     {
-        Logger::nlog("Parser error: " + std::string(e.what()));
-    }
-
-    Logger::nlog(std::string("name: ") + podcast.name);
-    Logger::nlog(std::string("description: ") + podcast.description);
-    Logger::nlog(std::string("url: ") + podcast.url);
-    Logger::nlog(std::string("author: ") + podcast.author);
-
-    for(Podcast::Episode e : podcast.episodes)
-    {
-        Logger::nlog(std::string("name: ") + e.name);
-        Logger::nlog(std::string("description: ") + e.description);
-        Logger::nlog(std::string("url: ") + e.url);
+        log.log("Parser error: " + std::string(e.what()));
     }
 
     return podcast;
