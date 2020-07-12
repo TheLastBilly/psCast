@@ -21,7 +21,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
-find_package(LibXml2 REQUIRED)
 
 set(SOURCE_DIR "source")
 set(INCLUDE_DIR "${SOURCE_DIR}/include")
@@ -29,6 +28,7 @@ set(INCLUDE_DIR "${SOURCE_DIR}/include")
 file(GLOB SRCS
   "${SOURCE_DIR}/*.cpp"
   "${INCLUDE_DIR}/*.hpp"
+  "${VITASDK}/arm-vita-eabi/include/libxml2/libxml/*.h"
 )
 
 SET_PROPERTY(GLOBAL PROPERTY LIBS "")
@@ -71,6 +71,7 @@ add_subdirectory(libraries)
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC "${INCLUDE_DIR}"
+  PUBLIC "${VITASDK}/arm-vita-eabi/include/libxml2"
 )
 
 GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
@@ -109,7 +110,6 @@ target_link_libraries(
   xml
   ${CURL_LIBRARIES}
   ${OPENSSL_LIBRARIES}
-  ${LibXml2_LIBRARIES}
   ${libs_l}
 )
 
