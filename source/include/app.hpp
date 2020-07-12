@@ -33,18 +33,27 @@ public:
     void setup();
     void run();
 
-    void goToWindow(MenuList *next_list);
-    void goToWindow(MenuList *next_list, MenuList * previous_list);
+    void goToList(MenuList *next_list);
+    void goToList(MenuList *next_list, MenuList * previous_list);
     
     Podcast downloadAndParseFeed(const std::string &url);
+    int updateFeedFile();
     int updateFromFeedFile();
+    void updatePodcastsList(const std::vector<Podcast> &podcasts);
 
-    std::string requestInputFromImeDialog(std::string title);
+    std::string requestInputFromImeDialog(std::string title, SceUInt32 type);
+
+    void appendUrlToFeed();
+
+    std::vector<Podcast> podcasts;
 private:
     Menu menu;
 
     MenuList main_menu_list;
     MenuList options_list;
+    MenuList podcast_list;
+
+    std::vector<std::string> feed_urls;
 
     enum WINDOW
     {

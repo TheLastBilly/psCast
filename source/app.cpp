@@ -15,9 +15,10 @@ App::App():
     main_menu_list(
         "psCast",
         {
-            MenuEntry("add url", [this](){menu.setStatusLabel(requestInputFromImeDialog("lo hice bitch"));}),
+            MenuEntry("podcasts", [this](){menu.goToList(&podcast_list);}),
+            MenuEntry("add url", [this](){appendUrlToFeed();}),
             MenuEntry("update", [this](){updateFromFeedFile();}),
-            MenuEntry("options", [this](){menu.goToWindow(&options_list);}),
+            MenuEntry("options", [this](){menu.goToList(&options_list);}),
         }
     ),
 
@@ -33,7 +34,6 @@ void App::init()
     free(dirStat);
 
     Logger::init(PSCAST_DATA_FOLDER "syslog.txt");
-    log.log("Log started");
 
 	SceAppUtilInitParam init;
 	SceAppUtilBootParam boot;
@@ -59,6 +59,7 @@ void App::setup()
     menu.setBackButton(SCE_CTRL_CROSS);
     
 	GUI::checkoutActiveGUI(&menu);
+    podcast_list.setLabel("Podcasts");
 }
 void App::run()
 {
@@ -72,12 +73,12 @@ Podcast App::downloadAndParseFeed(const std::string &url)
 {
     Https https;
     int st = https.download(url);
-    menu.setStatusLabel("Downloading: " + url);
-    menu.forceHeaderDraw();
+    menu.sendHeaderMessage("Downloading: " + url);
     
     Podcast podcast;
     try
     {
+        menu.sendHeaderMessage("Parsing " + url);
         log.log("stated parsing for \"" + url + "\"");
         if(https.getCurrentPage().size() < 1)
             throw std::runtime_error("request result from \"" + url + "\" is empty");
@@ -88,40 +89,43 @@ Podcast App::downloadAndParseFeed(const std::string &url)
         log.log("Parser error: " + std::string(e.what()));
     }
 
+    menu.sendHeaderMessage("Done!");
     return podcast;
+}
+
+int App::updateFeedFile()
+{
+    feed_urls = Utils::getLinesFromFile(PSCAST_RSS_LIST_FILE);
+    if(feed_urls.size() < 1)
+        return -1;
+
+    return OK;
 }
 
 int App::updateFromFeedFile()
 {
-    int fd = sceIoOpen(PSCAST_RSS_LIST_FILE, SCE_O_RDONLY | SCE_O_CREAT, 0777);
-    if(fd < 1)
-        return -1;
-    
-    size_t fs = sceIoLseek(fd, 0, SCE_SEEK_END);
-    sceIoLseek(fd, 0, SCE_SEEK_SET);
-    
-    if(fs < 6)
+    if(updateFeedFile() != OK)
         return -1;
 
-    char *buffer = (char *)malloc(fs*sizeof(char));
-    sceIoRead(fd, buffer, fs);
-
-    size_t index = 0, past_index = 0;
-    while( index < fs )
-    {
-        if(buffer[index] == '\n')
-        {
-            downloadAndParseFeed(std::string(&buffer[past_index], index-1));
-            past_index = index+1;
-        }
-        index++;
-    }
-
-    free(buffer);
+    for(std::string &s : feed_urls)
+        podcasts.push_back(downloadAndParseFeed(s));
+    
+    updatePodcastsList(podcasts);
     return OK;
 }
 
-std::string App::requestInputFromImeDialog(std::string title)
+void App::updatePodcastsList(const std::vector<Podcast> &podcasts)
+{
+    podcast_list.clear();
+    for(const Podcast &p : podcasts)
+    {
+        podcast_list.append(
+            MenuEntry(p.name, nullptr)
+        );
+    }
+}
+
+std::string App::requestInputFromImeDialog(std::string title, SceUInt32 type)
 {
     SceCommonDialogConfigParam dparam;
     sceCommonDialogConfigParamInit(&dparam);
@@ -138,7 +142,7 @@ std::string App::requestInputFromImeDialog(std::string title)
     param.sdkVersion = 0x03150021,
 	param.supportedLanguages = 0x0001FFFF;
 	param.languagesForced = SCE_TRUE;
-	param.type = SCE_IME_TYPE_DEFAULT;
+	param.type = type;
 	param.title = titleBuffer;
 	param.maxTextLength = 20;
 	param.inputTextBuffer = imeInputBuffer;
@@ -178,4 +182,29 @@ std::string App::requestInputFromImeDialog(std::string title)
     sceImeDialogTerm();
 
     return std::string(buffer);
+}
+
+void App::appendUrlToFeed()
+{
+    updateFeedFile();
+    std::string input = requestInputFromImeDialog("Feed URL", SCE_IME_TYPE_BASIC_LATIN);
+
+    for(std::string &s : feed_urls)
+        if(s == input)
+        {
+            menu.sendHeaderMessage("\"" + s + "\" already in list");
+            return;
+        }
+    
+    int fd = sceIoOpen(PSCAST_RSS_LIST_FILE, SCE_O_WRONLY | SCE_O_APPEND, 0777);
+    if(fd < 1)
+    {
+        menu.sendHeaderMessage("cannot open \"" PSCAST_RSS_LIST_FILE  "\"");
+        log.log("cannot open \"" PSCAST_RSS_LIST_FILE  "\"");
+        return;
+    }
+
+    menu.sendHeaderMessage("appended \"" + input + "\" to feed list");
+    sceIoWrite(fd, input.c_str(), input.size());
+    sceIoClose(fd);
 }

@@ -1,7 +1,7 @@
 #include "menu.hpp"
 
 Menu::Menu(MenuList * MainList)
-{goToWindow(MainList);}
+{goToList(MainList);}
 
 Menu::~Menu()
 {
@@ -62,7 +62,7 @@ void Menu::drawList( uint index )
     while(i < m_s && start < PSCAST_DISPLAY_HEIGHT)
     {
         vita2d_clear_screen();
-
+        
         if(index == i)    
             vita2d_draw_rectangle(
                 0, start, 
@@ -125,6 +125,11 @@ void Menu::forceHeaderDraw()
     vita2d_end_drawing();
     vita2d_swap_buffers();
 }
+void Menu::sendHeaderMessage( const std::string &label )
+{
+    setStatusLabel(label);
+    forceHeaderDraw();
+}
 
 void Menu::goDownOnList()
 {   
@@ -137,7 +142,7 @@ void Menu::goUpOnList()
         entry_index--;
 }
 
-void Menu::goToWindow(MenuList *next_list)
+void Menu::goToList(MenuList *next_list)
 {
     if(next_list == nullptr)
         return;
@@ -194,6 +199,7 @@ int Menu::draw()
     }
 
     vita2d_start_drawing();
+    vita2d_clear_screen();
     drawHeader();
     drawList(entry_index);
     vita2d_end_drawing();

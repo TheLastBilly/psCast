@@ -21,6 +21,12 @@ public:
             label.size() > this->label.size() && 
             this->label.find(label) != std::string::npos;
     }
+
+    std::string getLabel()
+    {return label;}
+
+    void setLabel(const std::string &label)
+    {this->label = label;}
 };
 
 class MenuEntry: public MenuLabel
@@ -40,10 +46,6 @@ public:
     bool okay()
     {
         return callback != nullptr;
-    }
-    std::string getLabel()
-    {
-        return label;
     }
 };
 
@@ -67,9 +69,6 @@ public:
         entries = ml.entries;
         parent = ml.parent;
     }
-
-    std::string getLabel()
-    {return label;}
 
     void append( const MenuEntry &entry )
     {entries.push_back(entry);}
@@ -113,6 +112,9 @@ public:
     {this->parent = parent;}
     MenuList *getParentList()
     {return parent;}
+
+    void clear()
+    {entries.clear();}
 };
 
 /*
@@ -189,11 +191,12 @@ public:
 
     void setStatusLabel( const std::string &label );
     void forceHeaderDraw();
+    void sendHeaderMessage( const std::string &label );
 
     void goDownOnList();
     void goUpOnList();
 
-    void goToWindow(MenuList *next_list);
+    void goToList(MenuList *next_list);
 
     int setup() override;
     int draw() override;
