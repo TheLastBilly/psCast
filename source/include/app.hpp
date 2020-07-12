@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <psp2/appmgr.h>
 #include <psp2/io/stat.h>
 #include <psp2/kernel/processmgr.h>
@@ -34,7 +33,8 @@ public:
     void setup();
     void run();
 
-    void goToWindow(MenuList *ml);
+    void goToWindow(MenuList *next_list);
+    void goToWindow(MenuList *next_list, MenuList * previous_list);
     
     Podcast downloadAndParseFeed(const std::string &url);
     int updateFromFeedFile();
@@ -45,8 +45,6 @@ private:
 
     MenuList main_menu_list;
     MenuList options_list;
-
-    MenuList *current_list;
 
     enum WINDOW
     {

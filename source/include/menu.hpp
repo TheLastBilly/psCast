@@ -6,8 +6,6 @@
 
 #include "gui.hpp"
 
-#define HEADER_DEBUG
-
 class MenuLabel 
 {
 protected:
@@ -53,6 +51,7 @@ class MenuList: public MenuLabel
 {
 private:
     std::vector<MenuEntry> entries;
+    MenuList * parent = nullptr;
 
 public:
     MenuList(){}
@@ -66,17 +65,14 @@ public:
         MenuLabel(ml.label)
     {
         entries = ml.entries;
+        parent = ml.parent;
     }
 
     std::string getLabel()
-    {
-        return label;
-    }
+    {return label;}
 
     void append( const MenuEntry &entry )
-    {
-        entries.push_back(entry);
-    }
+    {entries.push_back(entry);}
 
     void erase( size_t index )
     {
@@ -93,9 +89,7 @@ public:
     }
 
     size_t size()
-    {
-        return entries.size();
-    }
+    {return entries.size();}
 
     MenuEntry operator[](const size_t index)
     {
@@ -113,9 +107,12 @@ public:
         return MenuEntry();
     }
     MenuEntry at( const size_t index ) 
-    {
-        return (*this)[index];
-    }
+    {return (*this)[index];}
+
+    void setParentList(MenuList * parent)
+    {this->parent = parent;}
+    MenuList *getParentList()
+    {return parent;}
 };
 
 /*
@@ -154,6 +151,8 @@ private:
     MenuList *menu_list = nullptr;
     MenuList internal_menu_list;
 
+    MenuList *current_list = nullptr;
+
     uint entry_width = PSCAST_DISPLAY_WIDTH;
 
     uint clear_text_color = RGBA8(240, 240, 230, 255);
@@ -172,7 +171,7 @@ private:
     std::function<void()> selectButtonCallback = nullptr;
 
 public:
-    Menu();
+    Menu( MenuList * MainList );
 
     ~Menu();
 
@@ -193,6 +192,8 @@ public:
 
     void goDownOnList();
     void goUpOnList();
+
+    void goToWindow(MenuList *next_list);
 
     int setup() override;
     int draw() override;

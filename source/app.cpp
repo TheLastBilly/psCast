@@ -15,9 +15,11 @@ App::App():
         {
             MenuEntry("add url", [this](){menu.setStatusLabel(requestInputFromImeDialog("lo hice bitch"));}),
             MenuEntry("update", [this](){updateFromFeedFile();}),
-            MenuEntry("options", [this](){goToWindow(&options_list);}),
+            MenuEntry("options", [this](){menu.goToWindow(&options_list);}),
         }
-    )
+    ),
+
+    menu(&main_menu_list)
 {}
 
 void App::init()
@@ -54,7 +56,6 @@ void App::setup()
     menu.setAcceptButton(SCE_CTRL_CIRCLE);
     menu.setBackButton(SCE_CTRL_CROSS);
     
-    menu.checkoutEntryList(&main_menu_list);
 	GUI::checkoutActiveGUI(&menu);
 }
 void App::run()
@@ -63,26 +64,6 @@ void App::run()
 	{
 		GUI::cycleActiveGUI();
 	}
-}
-
-void App::goToWindow(MenuList *ml)
-{
-    if(ml == nullptr)
-        return;
-    
-    if(this->current_list != nullptr)
-    {
-        MenuList *l = this->current_list;
-        menu.setBackButtonCallback(
-            [=](){
-                menu.checkoutEntryList(l);
-            }
-        );
-    }
-    else
-        menu.setBackButtonCallback(nullptr);
-    
-    this->current_list = ml;
 }
 
 Podcast App::downloadAndParseFeed(const std::string &url)

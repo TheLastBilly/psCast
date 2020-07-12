@@ -15,9 +15,7 @@ int main(int argc, char const *argv[])
 {
 	App app;
 	App::init();
-	Logger::nlog("init ok");
 	app.setup();
-	Logger::nlog("setup ok");
 	app.run();
 	App::end();
 	sceKernelExitProcess(0);

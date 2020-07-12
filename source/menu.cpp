@@ -1,7 +1,7 @@
 #include "menu.hpp"
 
-Menu::Menu()
-{}
+Menu::Menu(MenuList * MainList)
+{goToWindow(MainList);}
 
 Menu::~Menu()
 {
@@ -135,6 +135,30 @@ void Menu::goUpOnList()
 {
     if(entry_index > 0)
         entry_index--;
+}
+
+void Menu::goToWindow(MenuList *next_list)
+{
+    if(next_list == nullptr)
+        return;
+    
+    if(next_list->getParentList() == nullptr)
+        next_list->setParentList(this->current_list);
+    
+    setBackButtonCallback(
+        [=]()
+        {
+            if(next_list->getParentList() == nullptr)
+                return;
+            
+            checkoutEntryList(next_list->getParentList());
+            this->current_list = next_list->getParentList();
+            next_list->setParentList(nullptr);
+        }
+    );
+
+    this->current_list = next_list;
+    checkoutEntryList(next_list);
 }
 
 int Menu::setup()
