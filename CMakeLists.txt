@@ -21,6 +21,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 find_package(CURL REQUIRED)
 find_package(OpenSSL REQUIRED)
+find_package(LibXml2 REQUIRED)
 
 set(SOURCE_DIR "source")
 set(INCLUDE_DIR "${SOURCE_DIR}/include")
@@ -105,8 +106,10 @@ target_link_libraries(
   SceHttp_stub
   SceSsl_stub
   freetype
+  xml
   ${CURL_LIBRARIES}
   ${OPENSSL_LIBRARIES}
+  ${LibXml2_LIBRARIES}
   ${libs_l}
 )
 

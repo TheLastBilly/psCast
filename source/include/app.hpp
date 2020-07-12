@@ -26,6 +26,7 @@ public:
     };
 
     App();
+    ~App();
 
     static void init();
     static void end();
@@ -54,6 +55,7 @@ private:
     MenuList podcast_list;
 
     std::vector<std::string> feed_urls;
+    std::vector<MenuList *> podcast_episodes_list;
 
     enum WINDOW
     {

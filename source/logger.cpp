@@ -1,7 +1,5 @@
 #include "logger.hpp"
 
-#include <psp2/io/fcntl.h>
-
 bool Logger::is_init = false;
 int Logger::fd = 0;
 

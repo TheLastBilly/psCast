@@ -4,29 +4,18 @@
 #include <vector>
 
 #include "logger.hpp"
-#include "tinyxml2.h"
+#include "feedpp.h"
 
 class Podcast
 {
 private:
     bool is_valid = false;
 public:
-    enum
-    {
-        OK,
-        PARSER_CHANNEL_ERROR,
-        PARSER_TITLE_ERROR,
-        PARSER_AUTHOR_ERROR,
-        PARSER_LINK_ERROR,
-        PARSER_DESCRIPTION_ERROR,
-        PARSER_IMAGE_ERROR,
-    };
 
     std::string name; 
     std::string author;
     std::string description;
 
-    std::string image_path;
     std::string url;
 
     struct Episode

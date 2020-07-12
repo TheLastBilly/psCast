@@ -1,5 +1,9 @@
 #pragma once
 
+#include <psp2/io/fcntl.h>
+#include <psp2/rtc.h>
+
+#include <ctime>
 #include <iostream>
 #include <sstream>
 
@@ -39,8 +43,6 @@ public:
         {}
 
         void log(const std::string &msg)
-        {
-            Logger::nlog(name + ": " + msg);
-        }
+        {Logger::nlog(name + ": " + msg);}
     };
 };

@@ -142,6 +142,7 @@ int Https::download( std::string url )
 
 	CURL *curl;
 	curl = curl_easy_init();
+	current_page="";
 	if(curl) 
 	{
 		struct stringcurl body;

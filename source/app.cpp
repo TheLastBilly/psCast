@@ -25,6 +25,15 @@ App::App():
     menu(&main_menu_list)
 {}
 
+App::~App()
+{
+    for(MenuList *list : podcast_episodes_list)
+    {
+        if(list != nullptr)
+            delete list;
+    }
+}
+
 void App::init()
 {
 	struct SceIoStat * dirStat = (SceIoStat*)malloc(sizeof(SceIoStat));
@@ -93,13 +102,17 @@ Podcast App::downloadAndParseFeed(const std::string &url)
             throw std::runtime_error("request result from \"" + url + "\" is empty");
         
         st = podcast.parseFromXmlStream(dl->getCurrentPage());
+        if(st != Podcast::OK)
+            throw std::runtime_error(" error code: " + std::to_string(st));
     }
     catch(const std::exception &e)
     {
+        log.log("received xml: \n" + dl->getCurrentPage());
+
         if(dl != nullptr)
             delete dl;
         
-        log.log("Parser error: " + std::string(e.what()));
+        log.log("parser error: " + std::string(e.what()));
         menu.sendHeaderMessage("Error!");
         return podcast;
     }
@@ -139,10 +152,23 @@ int App::updateFromFeedFile()
 
 void App::updatePodcastsList(const std::vector<Podcast> &podcasts)
 {
+    podcast_list.clear();
+    for(MenuList *list : podcast_episodes_list)
+    {
+        if(list != nullptr)
+            delete list;
+    }
+    podcast_episodes_list.clear();
+
     for(const Podcast &p : podcasts)
     {
+        MenuList episodes;
+        for(const Podcast::Episode &e : p.episodes)
+            episodes.append(MenuEntry(e.name, nullptr));            
+        podcast_episodes_list.push_back(new MenuList(episodes));
+
         podcast_list.append(
-            MenuEntry(p.name, nullptr)
+            MenuEntry(p.name, goToList(podcast_episodes_list.back()))
         );
     }
 }
