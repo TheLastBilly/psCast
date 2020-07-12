@@ -7,6 +7,7 @@ Podcast::Podcast()
 
 int Podcast::parseFromXmlStream(const std::string &xml)
 {
+    is_valid = false;
     tinyxml2::XMLDocument stream;
     stream.Parse(xml.c_str(), xml.size());
     typedef tinyxml2::XMLElement* node_ptr; 
@@ -63,5 +64,6 @@ int Podcast::parseFromXmlStream(const std::string &xml)
         }
     }
 
+    is_valid = true;
     return OK;
 }

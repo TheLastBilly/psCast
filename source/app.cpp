@@ -71,23 +71,41 @@ void App::run()
 
 Podcast App::downloadAndParseFeed(const std::string &url)
 {
-    Https https;
-    int st = https.download(url);
-    menu.sendHeaderMessage("Downloading: " + url);
     
     Podcast podcast;
+    HttpBase * dl = nullptr;
     try
     {
-        menu.sendHeaderMessage("Parsing " + url);
-        log.log("stated parsing for \"" + url + "\"");
-        if(https.getCurrentPage().size() < 1)
+        menu.sendHeaderMessage("Downloading: " + url + "...");
+        log.log("downloading \"" + url + "\"...");
+        int st;
+
+        if(url.find("https://") != std::string::npos)
+            dl = new Https();
+        else
+            dl = new Http();
+
+        st = dl->download(url);
+
+        menu.sendHeaderMessage("Parsing " + url + "...");
+        log.log("started parsing for \"" + url + "\"");
+        if(dl->getCurrentPage().size() < 1)
             throw std::runtime_error("request result from \"" + url + "\" is empty");
-        st = podcast.parseFromXmlStream(https.getCurrentPage());
+        
+        st = podcast.parseFromXmlStream(dl->getCurrentPage());
     }
     catch(const std::exception &e)
     {
+        if(dl != nullptr)
+            delete dl;
+        
         log.log("Parser error: " + std::string(e.what()));
+        menu.sendHeaderMessage("Error!");
+        return podcast;
     }
+    
+    if(dl != nullptr)
+        delete dl;
 
     menu.sendHeaderMessage("Done!");
     return podcast;
@@ -107,8 +125,13 @@ int App::updateFromFeedFile()
     if(updateFeedFile() != OK)
         return -1;
 
+    podcasts.clear();
     for(std::string &s : feed_urls)
-        podcasts.push_back(downloadAndParseFeed(s));
+    {
+        Podcast p = downloadAndParseFeed(s);
+        if(p.isValid())
+            podcasts.push_back(p);
+    }
     
     updatePodcastsList(podcasts);
     return OK;
@@ -116,7 +139,6 @@ int App::updateFromFeedFile()
 
 void App::updatePodcastsList(const std::vector<Podcast> &podcasts)
 {
-    podcast_list.clear();
     for(const Podcast &p : podcasts)
     {
         podcast_list.append(
@@ -157,7 +179,7 @@ std::string App::requestInputFromImeDialog(std::string title, SceUInt32 type)
             showDial = false;
         }
 
-        if(sceImeDialogGetStatus() == 2)
+        if(sceImeDialogGetStatus() == SceCommonDialogStatus::SCE_COMMON_DIALOG_STATUS_FINISHED)
         {
             SceImeDialogResult rst;
             memset(&rst, 0, sizeof(SceImeDialogResult));
@@ -188,6 +210,8 @@ void App::appendUrlToFeed()
 {
     updateFeedFile();
     std::string input = requestInputFromImeDialog("Feed URL", SCE_IME_TYPE_BASIC_LATIN);
+    if(input.size() < 1)
+        return;
 
     for(std::string &s : feed_urls)
         if(s == input)
@@ -204,7 +228,8 @@ void App::appendUrlToFeed()
         return;
     }
 
-    menu.sendHeaderMessage("appended \"" + input + "\" to feed list");
+    input.append("\n");
     sceIoWrite(fd, input.c_str(), input.size());
+    menu.sendHeaderMessage("appended \"" + input + "\" to feed list");
     sceIoClose(fd);
 }

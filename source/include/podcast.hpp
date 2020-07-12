@@ -8,6 +8,8 @@
 
 class Podcast
 {
+private:
+    bool is_valid = false;
 public:
     enum
     {
@@ -57,4 +59,7 @@ public:
     }
 
     int parseFromXmlStream(const std::string &xml);
+    
+    bool isValid()
+    {return is_valid;}
 };

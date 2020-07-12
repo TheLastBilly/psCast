@@ -86,7 +86,7 @@ std::vector<std::string> Utils::getLinesFromFile(const char * file_name)
     {
         if(buffer[index] == '\n')
         {
-            lines.push_back(std::string(&buffer[past_index], index-1));
+            lines.push_back(std::string(&buffer[past_index], index - past_index));
             past_index = index+1;
         }
         index++;
