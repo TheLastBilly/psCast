@@ -79,7 +79,6 @@ target_link_libraries(
   freetype
   png
   jpeg
-  z
   c
   m
   mpg123
@@ -105,7 +104,8 @@ target_link_libraries(
   SceHttp_stub
   SceSsl_stub
   freetype
-  xml
+  xml2
+  z
   ${CURL_LIBRARIES}
   ${OPENSSL_LIBRARIES}
   ${libs_l}

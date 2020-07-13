@@ -11,6 +11,10 @@ class Podcast
 private:
     bool is_valid = false;
 public:
+    enum
+    {
+        OK
+    };
 
     std::string name; 
     std::string author;
@@ -40,8 +44,6 @@ public:
         name = podcast.name;
         author = podcast.author;
         description = podcast.description;
-
-        image_path = podcast.image_path;
         url = podcast.url;
 
         episodes = podcast.episodes;
