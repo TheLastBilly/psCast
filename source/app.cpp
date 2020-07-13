@@ -12,6 +12,10 @@ App::App():
         }
     ),
 
+    podcast_list(
+        "Podcasts"
+    ),
+
     main_menu_list(
         "psCast",
         {
@@ -27,7 +31,7 @@ App::App():
 
 App::~App()
 {
-    for(MenuList *list : podcast_episodes_list)
+    for(MenuList *list : podcast_episodes_lists)
     {
         if(list != nullptr)
             delete list;
@@ -68,7 +72,6 @@ void App::setup()
     menu.setBackButton(SCE_CTRL_CROSS);
     
 	GUI::checkoutActiveGUI(&menu);
-    podcast_list.setLabel("Podcasts");
 }
 void App::run()
 {
@@ -107,7 +110,9 @@ Podcast App::downloadAndParseFeed(const std::string &url)
     }
     catch(const std::exception &e)
     {
+#ifdef PSCAST_LOG_XML
         log.log("received xml: \n" + dl->getCurrentPage());
+#endif
 
         if(dl != nullptr)
             delete dl;
@@ -153,22 +158,24 @@ int App::updateFromFeedFile()
 void App::updatePodcastsList(const std::vector<Podcast> &podcasts)
 {
     podcast_list.clear();
-    for(MenuList *list : podcast_episodes_list)
+    for(MenuList *list : podcast_episodes_lists)
     {
         if(list != nullptr)
             delete list;
     }
-    podcast_episodes_list.clear();
+    podcast_episodes_lists.clear();
 
     for(const Podcast &p : podcasts)
     {
         MenuList episodes;
         for(const Podcast::Episode &e : p.episodes)
-            episodes.append(MenuEntry(e.name, nullptr));            
-        podcast_episodes_list.push_back(new MenuList(episodes));
+            episodes.append(MenuEntry(e.name, nullptr));
+
+        MenuList * list_ptr = new MenuList(episodes);
+        podcast_episodes_lists.push_back(list_ptr);
 
         podcast_list.append(
-            MenuEntry(p.name, goToList(podcast_episodes_list.back()))
+            MenuEntry(p.name, [=](){menu.goToList(list_ptr);})
         );
     }
 }
