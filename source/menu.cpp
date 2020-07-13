@@ -133,13 +133,11 @@ void Menu::sendHeaderMessage( const std::string &label )
 
 void Menu::goDownOnList()
 {   
-    if(entry_index+1 < menu_list->size())
-        entry_index++;
+    menu_list->increaseIndex();
 }
 void Menu::goUpOnList()
 {
-    if(entry_index > 0)
-        entry_index--;
+    menu_list->decreseIndex();
 }
 
 void Menu::goToList(MenuList *next_list)
@@ -173,14 +171,18 @@ int Menu::setup()
 
 int Menu::draw()
 {
+    size_t index = 0;
     if(this->menu_list != nullptr)
     {
         if(pressed_buttons & SCE_CTRL_DOWN)
             goDownOnList();
         else if(pressed_buttons & SCE_CTRL_UP)
             goUpOnList();
-        else if(pressed_buttons & accept_button)
-            menu_list->at(entry_index).run();
+        
+        index = menu_list->getIndex();
+
+        if(pressed_buttons & accept_button)
+            menu_list->at(index).run();
         else if(pressed_buttons & back_button)
         {
             if(backButtonCallback != nullptr)
@@ -201,7 +203,7 @@ int Menu::draw()
     vita2d_start_drawing();
     vita2d_clear_screen();
     drawHeader();
-    drawList(entry_index);
+    drawList(index);
     vita2d_end_drawing();
     vita2d_swap_buffers();
 

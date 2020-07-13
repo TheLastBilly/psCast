@@ -54,6 +54,7 @@ class MenuList: public MenuLabel
 private:
     std::vector<MenuEntry> entries;
     MenuList * parent = nullptr;
+    size_t index = 0;
 
 public:
     MenuList(){}
@@ -115,7 +116,20 @@ public:
 
     void clear()
     {entries.clear();}
-};
+
+    size_t getIndex()
+    {return index;}
+    void increaseIndex()
+    {
+        if(index+1 < size())
+           index++;
+    }
+    void decreseIndex()
+    {
+        if(index > 0)
+            index--;
+    }
+};  
 
 /*
 ##########################################
