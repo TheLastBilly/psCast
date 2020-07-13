@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "log.h"
 #include "date.h"
+#include "utils.h"
 
 #ifdef USE_BOOST_REGEX
 #include <boost/regex.hpp>
@@ -39,7 +40,7 @@ std::string date::format(const std::string& date)
 
     if (date::validate(date, REGEX_RFC822))
     {
-        p = strptime(date.c_str(), "%a, %d %b %Y %H:%M:%S", &tm_date);
+        p = utils::strptime(date.c_str(), "%a, %d %b %Y %H:%M:%S", &tm_date);
     }
     else if (date::validate(date, REGEX_W3CDTF))
     {
@@ -47,31 +48,31 @@ std::string date::format(const std::string& date)
     }
     else if (date::validate(date, REGEX_ISO8601))
     {
-        p = strptime(date.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm_date);
+        p = utils::strptime(date.c_str(), "%Y-%m-%dT%H:%M:%SZ", &tm_date);
 
         if (p == nullptr)
         {
-            p = strptime(date.c_str(), "%t%Y-%m-%dT%H:%M%t", &tm_date);
+            p = utils::strptime(date.c_str(), "%t%Y-%m-%dT%H:%M%t", &tm_date);
         }
 
         if (p == nullptr)
         {
-            p = strptime(date.c_str(), "%t%Y-%m-%d", &tm_date);
+            p = utils::strptime(date.c_str(), "%t%Y-%m-%d", &tm_date);
         }
 
         if (p == nullptr)
         {
             // warning : skip the time-zone
-            p = strptime(date.c_str(), "%FT%T", &tm_date);
+            p = utils::strptime(date.c_str(), "%FT%T", &tm_date);
         }
     }
     else if (date::validate(date, REGEX_RFC822_NTZ))
     {
-        p = strptime(date.c_str(), "%a, %d %b %Y %T", &tm_date);
+        p = utils::strptime(date.c_str(), "%a, %d %b %Y %T", &tm_date);
     }
     else if (date::validate(date, REGEX_NOWEEKDAY))
     {
-        p = strptime(date.c_str(), "%d %b %Y %T %z", &tm_date);
+        p = utils::strptime(date.c_str(), "%d %b %Y %T %z", &tm_date);
     }
     else
     {
@@ -94,11 +95,11 @@ char* date::w3cdtf_to_tm(const std::string& date, struct tm *tm_arg)
 
     stm.tm_mday = 1;
 
-    char * ptr = strptime(date.c_str(), "%Y", &stm);
+    char * ptr = utils::strptime(date.c_str(), "%Y", &stm);
 
     if (ptr != NULL)
     {
-        ptr = strptime(ptr, "-%m", &stm);
+        ptr = utils::strptime(ptr, "-%m", &stm);
     }
     else
     {
@@ -107,21 +108,22 @@ char* date::w3cdtf_to_tm(const std::string& date, struct tm *tm_arg)
 
     if (ptr != NULL)
     {
-        ptr = strptime(ptr, "-%d", &stm);
+        ptr = utils::strptime(ptr, "-%d", &stm);
     }
     if (ptr != NULL)
     {
-        ptr = strptime(ptr, "T%H", &stm);
+        ptr = utils::strptime(ptr, "T%H", &stm);
     }
     if (ptr != NULL)
     {
-        ptr = strptime(ptr, ":%M", &stm);
+        ptr = utils::strptime(ptr, ":%M", &stm);
     }
     if (ptr != NULL)
     {
-        ptr = strptime(ptr, ":%S", &stm);
+        ptr = utils::strptime(ptr, ":%S", &stm);
     }
 
+#ifdef ENABLE_GMTOFF
     int offs = 0;
     if (ptr != NULL)
     {
@@ -140,10 +142,15 @@ char* date::w3cdtf_to_tm(const std::string& date, struct tm *tm_arg)
             stm.tm_gmtoff = 0;
         }
     }
+#endif
 
     time_t t = mktime(&stm);
     time_t x = time(NULL);
+
+#ifdef ENABLE_GMTOFF
     t += localtime(&x)->tm_gmtoff + offs;
+#endif
+
     std::memcpy(tm_arg, std::localtime(&t), sizeof(struct tm));
     return ptr;
 }

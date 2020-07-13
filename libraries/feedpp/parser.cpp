@@ -3,14 +3,12 @@
  * Licensed under the MIT/X Consortium License. See file LICENSE
  * for more information.
  */
+#include "exception.h"
+#include "utils.h"
 
-#include <types.h>
-#include <exception.h>
-#include <utils.h>
-
-#include <log.h>
-#include <parser.h>
-#include <rsspp_internal.h>
+#include "log.h"
+#include "parser.h"
+#include "rsspp_internal.h"
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <curl/curl.h>

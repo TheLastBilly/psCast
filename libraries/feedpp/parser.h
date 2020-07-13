@@ -2,6 +2,7 @@
 #define _PARSER_H
 
 #include <string>
+#include "rsspp.h"
 
 namespace feedpp {
 

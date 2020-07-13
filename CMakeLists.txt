@@ -28,7 +28,6 @@ set(INCLUDE_DIR "${SOURCE_DIR}/include")
 file(GLOB SRCS
   "${SOURCE_DIR}/*.cpp"
   "${INCLUDE_DIR}/*.hpp"
-  "${VITASDK}/arm-vita-eabi/include/libxml2/libxml/*.h"
 )
 
 SET_PROPERTY(GLOBAL PROPERTY LIBS "")
@@ -71,7 +70,6 @@ add_subdirectory(libraries)
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC "${INCLUDE_DIR}"
-  PUBLIC "${VITASDK}/arm-vita-eabi/include/libxml2"
 )
 
 GET_PROPERTY(libs_l GLOBAL PROPERTY LIBS)
