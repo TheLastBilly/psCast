@@ -1,5 +1,5 @@
 # psCast
-A podcast client app for the PS Vita
+A podcast client app for the PS Vita. Original logo design was made by [NotMatei](https://github.com/NotMatei).
 
 # Building
 
